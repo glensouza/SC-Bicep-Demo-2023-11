@@ -1,0 +1,44 @@
+name: Provision Infrastructure
+
+on:
+  push:
+    branches:
+      - "main" 
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log into Azure
+      uses: azure/login@v1
+      with:
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+
+    - name: Empty Out Azure Environment
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.48.1
+        inlineScript: az group delete --name ${{ vars.RESOURCE_NAME }} --yes
+  
+    - name: Provision Resources
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        scope: subscription
+        region: centralus
+        template: ./main.bicep
+        parameters: location=centralus commonResourceName=${{ vars.RESOURCE_NAME }}
+        failOnStdErr: false
+        deploymentName: bicep-ci-${{ github.run_id }}
+        # deploymentMode: Complete
