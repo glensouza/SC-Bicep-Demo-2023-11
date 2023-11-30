@@ -4,6 +4,7 @@ targetScope = 'resourceGroup'
 param location string = resourceGroup().location
 
 @description('Base Name of Resources')
+@minLength(3)
 param commonResourceName string = 'gsorservicebusdemo'
 var resourceName = toLower(commonResourceName)
 

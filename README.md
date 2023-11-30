@@ -143,10 +143,13 @@ To create a workflow, take the following steps:
           # Checkout code
         - uses: actions/checkout@main
     
-          # Log into Azure
-        - uses: azure/login@v1
+        # Log into Azure
+        - name: Log into Azure
+          uses: azure/login@v1
           with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
     
           # Deploy Bicep file
         - name: deploy
